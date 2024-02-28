@@ -1,40 +1,4 @@
-import 'package:dart_basic_2/src/components/async/future.dart';
-import 'package:dart_basic_2/src/components/isolates/isolates.dart';
-import 'package:dart_basic_2/src/components/class/InheritanceClass.dart';
-import 'package:dart_basic_2/src/components/class/InvokableClass.dart';
-import 'package:dart_basic_2/src/components/class/abstractClass.dart';
-import 'package:dart_basic_2/src/components/class/enumClass.dart';
-import 'package:dart_basic_2/src/components/class/exceptionClass.dart';
-import 'package:dart_basic_2/src/components/class/extensionsClass.dart';
-import 'package:dart_basic_2/src/components/class/firstClass.dart';
-import 'package:dart_basic_2/src/components/class/constructorsClass.dart';
-import 'package:dart_basic_2/src/components/class/getterSetterClass.dart';
-import 'package:dart_basic_2/src/components/class/interfaceClass.dart';
-import 'package:dart_basic_2/src/components/class/mixinsClass.dart';
-import 'package:dart_basic_2/src/components/class/staticsClass.dart';
-import 'package:dart_basic_2/src/components/collection-type/dictionary.dart';
-import 'package:dart_basic_2/src/components/collection-type/list.dart';
-import 'package:dart_basic_2/src/components/collection-type/set.dart';
-import 'package:dart_basic_2/src/components/func/anonymousFunc.dart';
-import 'package:dart_basic_2/src/components/func/secondFunc.dart';
-import 'package:dart_basic_2/src/components/func/cascateNotation.dart';
-import 'package:dart_basic_2/src/components/func/firstFunc.dart';
-import 'package:dart_basic_2/src/components/func/funcScope.dart';
-import 'package:dart_basic_2/src/components/library/firstLibrary.dart';
-import 'package:dart_basic_2/src/components/primitive-type/generics.dart';
-import 'package:dart_basic_2/src/components/loop/collectionLoop.dart';
-import 'package:dart_basic_2/src/components/loop/doWhile.dart';
-import 'package:dart_basic_2/src/components/loop/for-loop.dart';
-import 'package:dart_basic_2/src/components/loop/whileLoop.dart';
-import 'package:dart_basic_2/src/components/modifier/modifier.dart';
-import 'package:dart_basic_2/src/components/null-safety/nullSafety.dart';
-import 'package:dart_basic_2/src/components/operations/operations.dart';
-import 'package:dart_basic_2/src/components/primitive-type/stringInterpolation.dart';
-import 'package:dart_basic_2/src/components/primitive-type/type.dart';
-import 'package:dart_basic_2/src/components/selection-constructors/ifElse.dart';
-import 'package:dart_basic_2/src/components/selection-constructors/switchCase.dart';
-import 'package:dart_basic_2/src/components/assertions/assertions.dart';
-import 'package:dart_basic_2/src/components/async/stream.dart';
+import 'package:dart_basic_2/dart_basic_2.dart';
 
 /// Per far partire un'app:
 /// dart run main.dart

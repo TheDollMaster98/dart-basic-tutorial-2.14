@@ -1,59 +1,84 @@
-/// Async/await in Dart:
-/// Dart sorride al paradigma event-dreamer
-/// semplificando la programmazione reattiva programmata agli eventi.
-/// - "async" = funzione asincrone.
-/// - "await" = attendo il risultato di una "future".
-/// - "future" = sono come le promise su js.
-/// quindi sono delle func che non restituiscono subito un valore
-/// ma eseguono delle computazioni in modo asincrono in background
-/// quando il risultato è pronto viene restituito al chiamate.
-///
-///
+/// Questa libreria dimostra l'uso di async/await in Dart per gestire
+/// operazioni asincrone, come le richieste HTTP, che possono richiedere del tempo
+/// per essere completate.
+/// Dart supporta pienamente la programmazione asincrona tramite il concetto di
+/// Future, simile a Promise in JavaScript.
 library;
 
-// Importazioni necessarie
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
+import 'package:http/http.dart' as http; // Per eseguire richieste HTTP
+import 'dart:convert' as convert; // Per lavorare con JSON
 
-// Funzione principale asincrona
+// Funzione principale asincrona che dimostra l'uso di varie richieste HTTP
 void future() async {
-  print('first step'); // Vengono stampati prima del await
+  print('First step: Esecuzione iniziata'); // Stampato prima dell'await
 
   try {
-    // Esecuzione di operazioni asincrone con async/await
-    final response = await performHTTPRequest();
-    print("Risposta con async/await: $response\n");
+    // Effettuiamo una richiesta HTTP GET usando async/await
+    final getResponse = await performHTTPRequest('GET');
+    print("Risposta GET con async/await: $getResponse\n");
 
-    // Deserializzazione del JSON in un oggetto Todo
-    final jsonResponse = convert.jsonDecode(response);
+    // Deserializziamo la risposta JSON in un oggetto Todo
+    final jsonResponse = convert.jsonDecode(getResponse);
     final todo = Todo.fromJson(jsonResponse);
 
-    // Stampa dell'oggetto risultante
-    print("Chiamata deserializzata: $todo");
+    // Stampiamo l'oggetto deserializzato
+    print("Risultato deserializzato: $todo\n");
+
+    // Eseguiamo una richiesta HTTP POST con async/await
+    final postResponse = await performHTTPRequest('POST');
+    print("Risposta POST: $postResponse\n");
+
+    // Eseguiamo una richiesta HTTP PUT con async/await
+    final putResponse = await performHTTPRequest('PUT');
+    print("Risposta PUT: $putResponse\n");
+
+    // Eseguiamo una richiesta HTTP DELETE con async/await
+    final deleteResponse = await performHTTPRequest('DELETE');
+    print("Risposta DELETE: $deleteResponse\n");
   } catch (e) {
-    print("Errore durante l'esecuzione dell'operazione asincra: $e");
+    print("Errore durante l'esecuzione di operazioni asincrone: $e");
   }
 
-  print('last step'); // Vengono stampati dopo del await;
+  print('Last step: Esecuzione terminata'); // Stampato dopo l'await
 }
 
-// Funzione asincrona per eseguire una chiamata HTTP
-Future<String> performHTTPRequest() async {
-  // la funziona get è essa stessa una future:
-  // con then specifico il risultato ottenuto dalla future.
-  // tuttavia romperebbe il flusso di esecuzione dle metodo:
-  // http.get(url).then((response) {...});
+/// Funzione asincrona per eseguire una richiesta HTTP, gestendo vari metodi (GET, POST, PUT, DELETE)
+Future<String> performHTTPRequest(String method) async {
   final url = Uri.https('jsonplaceholder.typicode.com', '/todos/1');
-  final response = await http.get(url);
 
-  if (response.statusCode == 200) {
+  // A seconda del metodo HTTP richiesto, eseguiamo l'operazione corrispondente
+  http.Response response;
+
+  switch (method) {
+    case 'GET':
+      response = await http.get(url); // Richiesta GET
+      break;
+    case 'POST':
+      response =
+          await http.post(url, body: {'title': 'New Todo'}); // Richiesta POST
+      break;
+    case 'PUT':
+      response =
+          await http.put(url, body: {'title': 'Updated Todo'}); // Richiesta PUT
+      break;
+    case 'DELETE':
+      response = await http.delete(url); // Richiesta DELETE
+      break;
+    default:
+      throw Exception('Metodo HTTP non supportato');
+  }
+
+  // Verifichiamo lo status della risposta HTTP
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    // Se la richiesta è andata a buon fine, restituiamo il corpo della risposta
     return response.body;
   } else {
-    throw Exception('Failed to load page');
+    // Se la richiesta fallisce, lanciamo un'eccezione
+    throw Exception('Failed to perform $method request');
   }
 }
 
-// Classe Todo per rappresentare un oggetto Todo
+/// Classe Todo per rappresentare un oggetto Todo recuperato dal server.
 class Todo {
   final int userId;
   final int id;
@@ -75,7 +100,7 @@ class Todo {
         completed: json['completed'],
       );
 
-  // Metodo toString per una rappresentazione leggibile
+  // Metodo toString per ottenere una rappresentazione leggibile
   @override
   String toString() =>
       "Todo: userId=$userId, id=$id, title='$title', completed=$completed";

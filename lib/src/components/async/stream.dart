@@ -1,49 +1,72 @@
 /**
  * Programmazione Asincrona: Futures e Streams
  * 
- * - "async": Dichiarazione di funzioni asincrone.
- * - "await": Attesa del risultato di una Future, implica l'attesa del suo completamento.
- * - "Stream": Flusso di valori trasmessi in modo asincrono.
+ * - "async": Indica che una funzione è asincrona e restituisce una Future.
+ * - "await": Attende il completamento di una Future prima di continuare.
+ * - "Stream": Flusso di dati che trasmette valori in modo asincrono.
+ *   Invece di restituire un singolo valore come una Future, uno Stream può
+ *   emettere più valori nel tempo.
  * 
  * Generatori:
- * - "sync*": Generatore sincrono che restituisce un iterable.
+ * - "sync*": Generatore sincrono che restituisce un Iterable.
  * - "async*": Generatore asincrono che restituisce uno Stream.
+ *   Gli Stream sono utili per sequenze di valori asincroni, come la lettura
+ *   di dati da una sorgente esterna.
  * 
  * Iterable:
- * - Un oggetto che può essere iterato, producendo una sequenza di valori.
+ * - Un oggetto che può essere iterato (es. con un ciclo for-in) e produce
+ *   una sequenza di valori. Utile quando tutti i valori sono disponibili
+ *   immediatamente.
  */
 void stream() async {
-  // Utilizzo di 'await for' per iterare attraverso gli elementi dello Stream.
+  // Utilizziamo 'await for' per iterare attraverso gli elementi emessi dallo Stream.
+  // 'await for' attende che ogni elemento sia disponibile prima di proseguire.
   await for (final number in fib(10)) {
-    print("Numero fib: $number");
+    print("Numero Fibonacci dallo Stream: $number");
   }
 }
 
-// Funzione asincrona che restituisce uno Stream<int>.
+// Funzione asincrona che genera una sequenza di numeri di Fibonacci come uno Stream<int>.
 Stream<int> fib(int n) async* {
-  // Funzione ricorsiva per calcolare il numero di Fibonacci.
+  // Funzione privata ricorsiva per calcolare il numero di Fibonacci.
   int _fib(int n) => n <= 2 ? 1 : _fib(n - 2) + _fib(n - 1);
 
-  // Emissione del valore nel flusso.
+  // Emissione del valore corrente della sequenza di Fibonacci nello Stream.
   yield _fib(n);
 
-  // Condizione di terminazione per evitare l'overflow.
+  // Se il valore di n è maggiore di 2, continuiamo a emettere i valori della sequenza.
   if (n > 2) {
-    // Utilizzo di 'yield*' per emettere i valori dello Stream di una chiamata ricorsiva.
+    // 'yield*' viene utilizzato per trasmettere tutti i valori emessi da un altro Stream.
+    // In questo caso, continuiamo la sequenza Fibonacci in modo ricorsivo.
     yield* fib(n - 1);
   }
 }
 
-// Funzione sincrona che restituisce un Iterable<int>.
+// Funzione sincrona che genera un Iterable<int> della sequenza di Fibonacci.
 Iterable<int> fib2(int n) sync* {
+  // Funzione privata ricorsiva per calcolare il numero di Fibonacci.
   int _fib2(int n) => n <= 2 ? 1 : _fib2(n - 2) + _fib2(n - 1);
 
-  // Emissione del valore nell'iterable.
+  // Emissione del valore corrente della sequenza di Fibonacci nell'Iterable.
   yield _fib2(n);
 
-  // Condizione di terminazione per non andare in overflow.
+  // Se n è maggiore di 2, continuiamo a emettere i valori della sequenza.
   if (n > 2) {
-    // Utilizzo di 'yield*' per emettere i valori dell'iterable di una chiamata ricorsiva.
+    // 'yield*' qui emette i valori dell'iterable risultante da una chiamata ricorsiva.
     yield* fib2(n - 1);
   }
 }
+
+/**
+ * Differenze tra Stream e Iterable:
+ * 
+ * - Uno Stream produce valori in modo asincrono (ad esempio, da una sorgente esterna 
+ *   come un file o una connessione di rete) e richiede che attendiamo ciascun valore.
+ * - Un Iterable, invece, è sincrono e produce immediatamente tutti i valori disponibili.
+ * 
+ * Utilizzo di 'async*' e 'sync*':
+ * - 'async*' consente di utilizzare generatori asincroni con valori che possono essere 
+ *   disponibili in modo differito o intermittente (es. dallo Stream).
+ * - 'sync*' è usato per produrre sequenze di valori in modo sincrono, ad esempio quando
+ *   i valori sono immediatamente disponibili.
+ */

@@ -8,13 +8,16 @@ library;
 import 'package:http/http.dart' as http; // Per eseguire richieste HTTP
 import 'dart:convert' as convert; // Per lavorare con JSON
 
-// Funzione principale asincrona che dimostra l'uso di varie richieste HTTP
+// Costante per la base URL del servizio REST API
+const String baseUrl = 'jsonplaceholder.typicode.com';
+
+/// Funzione principale asincrona che dimostra l'uso di varie richieste HTTP
 void future() async {
   print('First step: Esecuzione iniziata'); // Stampato prima dell'await
 
   try {
-    // Effettuiamo una richiesta HTTP GET usando async/await
-    final getResponse = await performHTTPRequest('GET');
+    // Effettuiamo una richiesta HTTP GET, passando il percorso relativo
+    final getResponse = await performHTTPRequest('GET', '/todos/1');
     print("Risposta GET con async/await: $getResponse\n");
 
     // Deserializziamo la risposta JSON in un oggetto Todo
@@ -24,47 +27,75 @@ void future() async {
     // Stampiamo l'oggetto deserializzato
     print("Risultato deserializzato: $todo\n");
 
-    // Eseguiamo una richiesta HTTP POST con async/await
-    final postResponse = await performHTTPRequest('POST');
+    // Eseguiamo una richiesta HTTP POST con un body
+    final postResponse = await performHTTPRequest(
+      'POST',
+      '/todos',
+      body: {'title': 'New Todo'},
+    );
     print("Risposta POST: $postResponse\n");
 
-    // Eseguiamo una richiesta HTTP PUT con async/await
-    final putResponse = await performHTTPRequest('PUT');
+    // Eseguiamo una richiesta HTTP PUT con un body
+    final putResponse = await performHTTPRequest(
+      'PUT',
+      '/todos/1',
+      body: {'title': 'Updated Todo'},
+    );
     print("Risposta PUT: $putResponse\n");
 
-    // Eseguiamo una richiesta HTTP DELETE con async/await
-    final deleteResponse = await performHTTPRequest('DELETE');
+    // Eseguiamo una richiesta HTTP DELETE, passando solo il percorso
+    final deleteResponse = await performHTTPRequest('DELETE', '/todos/1');
     print("Risposta DELETE: $deleteResponse\n");
   } catch (e) {
+    // Gestione degli errori nel caso in cui qualcosa vada storto
     print("Errore durante l'esecuzione di operazioni asincrone: $e");
   }
 
   print('Last step: Esecuzione terminata'); // Stampato dopo l'await
 }
 
-/// Funzione asincrona per eseguire una richiesta HTTP, gestendo vari metodi (GET, POST, PUT, DELETE)
-Future<String> performHTTPRequest(String method) async {
-  final url = Uri.https('jsonplaceholder.typicode.com', '/todos/1');
+/// Funzione asincrona per eseguire una richiesta HTTP.
+/// Accetta il metodo HTTP, l'URL e un body opzionale per POST/PUT.
+Future<String> performHTTPRequest(String method, String urlPath,
+    {Map<String, dynamic>? body}) async {
+  // Creiamo l'URL completo usando Uri.https
+  final url = Uri.https(baseUrl, urlPath);
 
-  // A seconda del metodo HTTP richiesto, eseguiamo l'operazione corrispondente
+  // Dichiarazione della variabile per contenere la risposta
   http.Response response;
 
+  // A seconda del metodo HTTP richiesto, eseguiamo l'operazione corrispondente
   switch (method) {
     case 'GET':
-      response = await http.get(url); // Richiesta GET
+      // Richiesta GET
+      response = await http.get(url);
       break;
     case 'POST':
-      response =
-          await http.post(url, body: {'title': 'New Todo'}); // Richiesta POST
+      // Richiesta POST, inviamo un oggetto JSON nel body se fornito
+      response = await http.post(
+        url,
+        body: body != null ? convert.jsonEncode(body) : null,
+        headers: {
+          'Content-Type': 'application/json'
+        }, // Definiamo l'header del contenuto
+      );
       break;
     case 'PUT':
-      response =
-          await http.put(url, body: {'title': 'Updated Todo'}); // Richiesta PUT
+      // Richiesta PUT, inviamo un oggetto JSON aggiornato nel body se fornito
+      response = await http.put(
+        url,
+        body: body != null ? convert.jsonEncode(body) : null,
+        headers: {
+          'Content-Type': 'application/json'
+        }, // Definiamo l'header del contenuto
+      );
       break;
     case 'DELETE':
-      response = await http.delete(url); // Richiesta DELETE
+      // Richiesta DELETE
+      response = await http.delete(url);
       break;
     default:
+      // Se il metodo non è riconosciuto, lanciamo un'eccezione
       throw Exception('Metodo HTTP non supportato');
   }
 
@@ -73,8 +104,9 @@ Future<String> performHTTPRequest(String method) async {
     // Se la richiesta è andata a buon fine, restituiamo il corpo della risposta
     return response.body;
   } else {
-    // Se la richiesta fallisce, lanciamo un'eccezione
-    throw Exception('Failed to perform $method request');
+    // Se la richiesta fallisce, lanciamo un'eccezione con il codice errore
+    throw Exception(
+        'Failed to perform $method request, Status code: ${response.statusCode}');
   }
 }
 
